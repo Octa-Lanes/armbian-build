@@ -1,0 +1,42 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "rockchip,rk3576";
+
+    fragment@0 {
+        target = <&uart0>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&uart0m0_xfer>;
+        };
+    };
+
+    fragment@1 {
+        target = <&uart4>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&uart4m1_xfer>;
+        };
+    };
+
+    fragment@2 {
+        target = <&uart7>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&uart7m0_xfer>;
+        };
+    };
+
+    fragment@3 {
+        target = <&uart10>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&uart10m1_xfer>;
+        };
+    };
+};
