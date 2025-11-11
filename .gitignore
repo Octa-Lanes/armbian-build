@@ -11,6 +11,9 @@ ubuntu-*-cloudimg-console.log
 !/config-docker.conf
 !/config-vagrant.conf
 
+### octimus-i resources directories
+user-data.tar.gz
+
 ### output directories
 /.tmp/
 /output/
