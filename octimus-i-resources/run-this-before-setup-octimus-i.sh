@@ -41,7 +41,7 @@ fi
 # 5. Extract user-data archive
 if [ -f /user-data/user-data.tar.gz ]; then
     echo "📦 Extracting /user-data/user-data.tar.gz..."
-    sudo tar -xvzf /user-data/user-data.tar.gz -C /
+    sudo tar -xvzf /user-data/user-data.tar.gz
 else
     echo "⚠️ /user-data/user-data.tar.gz not found, skipping extraction."
 fi
