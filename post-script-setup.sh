@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-#  HOPE-OS Post-Build Finalizer
+#  OCTIMUS-I Post-Build Finalizer
 #  Steps:
 #   1  Format recovery (p2) and userdata (p4) partitions
 #   2  Update fstab inside rootfs (p3)

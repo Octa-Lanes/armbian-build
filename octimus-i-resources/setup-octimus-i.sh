@@ -146,8 +146,6 @@ fi
 if [ -f /user-data/nginx-sun108.tgz ]; then
   echo "📦 Restoring nginx-sun108 configuration..."
   sudo tar xzf /user-data/nginx-sun108.tgz -C /
-  sudo systemctl enable nginx
-  sudo systemctl start nginx
   sudo nginx -t && ok "NGINX configuration test passed."
 else
   warn "nginx-sun108.tgz not found — skipping restore."
@@ -161,6 +159,10 @@ sudo chmod o+x /home/sun108
 sudo chmod -R 755 /home/sun108/sun108-frontend/dist
 sudo chmod -R 755 /home/sun108/sun108-so/dist
 ok "Gives read + execute access to sun108-frontend/dist and sun108-so/dist"
+
+step "Change journalctl to persistent mode and extend SystemMaxUse size..."
+sudo sed -i 's/^Storage=.*/Storage=persistent/; s/^SystemMaxUse=.*/SystemMaxUse=500M/' /etc/systemd/journald.conf && sudo systemctl restart systemd-journald
+ok "Journalctl is configued"
 
 echo "───────────────────────────────────────────────"
 echo -e "✅  ${GREEN}Octimus I setup completed successfully!${RESET}"
