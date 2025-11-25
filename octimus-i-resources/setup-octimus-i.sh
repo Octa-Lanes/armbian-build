@@ -130,6 +130,7 @@ sudo ln -sf /usr/bin/chromium /usr/bin/chromium-browser
 # Clear old Chromium singleton locks
 echo "🧹 Cleaning Chromium lock files..."
 sudo -u sun108 rm -f /home/sun108/.config/chromium/Singleton*
+sudo rm -rf ~/.cache/chromium
 
 # Start PM2 service for sun108-api
 if command -v pm2 >/dev/null 2>&1; then
@@ -153,7 +154,7 @@ fi
 
 ok "Final setup tasks completed."
 
-# ──── 6. Add file permission ────────────────
+# ──── Add file permission ────────────────
 step "Add file permission..."
 sudo chmod o+x /home/sun108
 sudo chmod -R 755 /home/sun108/sun108-frontend/dist
@@ -163,6 +164,82 @@ ok "Gives read + execute access to sun108-frontend/dist and sun108-so/dist"
 step "Change journalctl to persistent mode and extend SystemMaxUse size..."
 sudo sed -i 's/^Storage=.*/Storage=persistent/; s/^SystemMaxUse=.*/SystemMaxUse=500M/' /etc/systemd/journald.conf && sudo systemctl restart systemd-journald
 ok "Journalctl is configued"
+
+# ──── 11. Install Root & User Cron Jobs ─────────────────────────────
+step "Installing default cron jobs for root and user..."
+
+USER_NAME="sun108"
+USER_CRON_TMP="/tmp/${USER_NAME}_cron_current"
+ROOT_CRON_TMP="/tmp/root_cron_current"
+
+echo "=== Installing DEFAULT ROOT and USER cron jobs ==="
+
+#########################################################
+# 1) ROOT CRONTAB
+#########################################################
+
+ROOT_JOBS="
+0 0 * * * /home/$USER_NAME/sun108-ota-agent/ota-agent.sh
+*/1 * * * * bash '/home/$USER_NAME/sun108-ota-agent/watchdog-cable.sh'
+* * * * * bash '/home/$USER_NAME/sun108-ota-agent/watchdog-not-ready-state.sh'
+*/8 * * * * bash '/home/$USER_NAME/sun108-ota-agent/watchdog.sh'
+*/5 * * * * bash '/home/$USER_NAME/sun108-ota-agent/watchdog-module.sh'
+*/5 * * * * bash '/home/$USER_NAME/sun108-ota-agent/watchdog-teamviewerd.sh'
+*/1 * * * * bash '/home/$USER_NAME/sun108-ota-agent/watchdog-touchinput.sh'
+49 * * * * bash '/home/$USER_NAME/sun108-ota-agent/utils/redis-cli/check-version.sh'
+"
+
+echo ">> Setting root cron jobs..."
+
+# Load current root cron
+sudo crontab -l > "$ROOT_CRON_TMP" 2>/dev/null || touch "$ROOT_CRON_TMP"
+
+# Append missing entries only
+while IFS= read -r line; do
+  [ -z "$line" ] && continue
+  if ! grep -Fqx "$line" "$ROOT_CRON_TMP"; then
+    echo "$line" >> "$ROOT_CRON_TMP"
+  fi
+done <<< "$ROOT_JOBS"
+
+# Install updated root cron
+sudo crontab "$ROOT_CRON_TMP"
+ok "Root cron installed."
+
+#########################################################
+# 2) USER CRONTAB (for sun108)
+#########################################################
+
+USER_JOBS="
+*/1 * * * * DISPLAY=:0 bash '/home/$USER_NAME/sun108-ota-agent/watchdog-orientation.sh'
+*/1 * * * * DISPLAY=:0 bash '/home/$USER_NAME/sun108-ota-agent/watchdog-monitor.sh'
+"
+
+echo ">> Setting cron jobs for user $USER_NAME..."
+
+# Load current user cron
+crontab -u "$USER_NAME" -l > "$USER_CRON_TMP" 2>/dev/null || touch "$USER_CRON_TMP"
+
+# Append missing entries only
+while IFS= read -r line; do
+  [ -z "$line" ] && continue
+  if ! grep -Fqx "$line" "$USER_CRON_TMP"; then
+    echo "$line" >> "$USER_CRON_TMP"
+  fi
+done <<< "$USER_JOBS"
+
+# Install updated user cron
+crontab -u "$USER_NAME" "$USER_CRON_TMP"
+ok "User cron installed."
+
+echo "=== Cron setup completed successfully ==="
+
+echo "Root cron:"
+sudo crontab -l
+echo "-------------------------"
+echo "User cron ($USER_NAME):"
+crontab -u "$USER_NAME" -l
+echo "========================="
 
 echo "───────────────────────────────────────────────"
 echo -e "✅  ${GREEN}Octimus I setup completed successfully!${RESET}"
