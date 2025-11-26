@@ -42,51 +42,27 @@ sudo /usr/lib/kodmai-sw-updater/kodmai-sw-updater || warn "kodmai-sw-updater ini
 ok "Kodmai Updater installed."
 
 # ──── 4. Install Node.js (Manual Method) ──────
-step "Installing Node.js (v18.20.8) manually..."
-NODE_TAR="/user-data/node-v18.20.8-linux-arm64.tar.xz"
-NODE_DIR="/user-data/node-v18.20.8-linux-arm64"
-INSTALL_DIR="/usr/local/node-v18.20.8-linux-arm64"
+step "Installing Node.js (v18.20.8) ..."
 
-if [ -f "$NODE_TAR" ]; then
-  echo "📦 Extracting Node.js tarball..."
-  tar -xJf "$NODE_TAR" -C /user-data/
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
-  # Clean up existing installation if needed
-  if [ -d "$INSTALL_DIR" ]; then
-    echo "⚙️  Existing Node.js directory found, removing..."
-    sudo rm -rf "$INSTALL_DIR"
-  fi
+echo "🧹 Cleaning old node binaries..."
+sudo rm -f /usr/bin/node /usr/bin/npm /usr/bin/npx /usr/bin/corepack /usr/bin/pm2 /usr/bin/pm2-runtime /usr/bin/yarn
 
-  # Move and link
-  echo "📂 Moving Node.js to /usr/local..."
-  sudo mv "$NODE_DIR" /usr/local/
-  sudo ln -sfn "$INSTALL_DIR" /usr/local/node
+sudo apt install -y nodejs
 
-  # Add to PATH if not already there
-  if ! grep -q "/usr/local/node/bin" ~/.bashrc; then
-    echo "🛠️  Adding Node.js to PATH..."
-    echo 'export PATH=$PATH:/usr/local/node/bin' >> ~/.bashrc
-  fi
+echo "🧰 Installing global npm packages (yarn, pm2)..."
+npm install -g yarn pm2
 
-  # Ensure PATH is available for this script runtime
-  export PATH=$PATH:/usr/local/node/bin
-
-  # Create system-wide symlinks
-  echo "🔗 Linking Node.js binaries..."
-  sudo ln -sf /usr/local/node/bin/* /usr/local/bin/
-
-  # Install global npm tools
-  echo "🧰 Installing global npm packages (yarn, pm2)..."
-  npm install -g yarn pm2
-
-  # Verify installation
-  echo "Versions:"
-  node -v && npm -v && pm2 -v
-
-  ok "Node.js installed successfully."
-else
-  warn "Node tarball not found — skipping Node.js installation."
-fi
+echo "✔ Done. Testing..."
+which node
+node -v
+which npm
+npm -v
+which pm2
+pm2 -v
+which yarn
+yarn -v
 
 # ──── 5. Install Chromium + Unclutter (Kiosk Mode) ─────
 step "Installing Chromium + Unclutter..."
@@ -240,6 +216,14 @@ echo "-------------------------"
 echo "User cron ($USER_NAME):"
 crontab -u "$USER_NAME" -l
 echo "========================="
+
+# ──── 12. Change boot splash image ────────────────
+step "Change boot splash image to SVT logo..."
+sudo cp -r /user-data/octalanes /usr/share/plymouth/themes
+sudo ln -sf /usr/share/plymouth/themes/octalanes/octalanes.plymouth /etc/alternatives/default.plymouth
+sudo ln -sf /etc/alternatives/default.plymouth /usr/share/plymouth/themes/default.plymouth
+sudo mount -o remount,rw /boot
+sudo update-initramfs -u
 
 echo "───────────────────────────────────────────────"
 echo -e "✅  ${GREEN}Octimus I setup completed successfully!${RESET}"
