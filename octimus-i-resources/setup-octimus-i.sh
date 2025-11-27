@@ -41,7 +41,7 @@ cp /user-data/machine-info.json /tmp/ 2>/dev/null || warn "machine-info.json not
 sudo /usr/lib/kodmai-sw-updater/kodmai-sw-updater || warn "kodmai-sw-updater initialization failed."
 ok "Kodmai Updater installed."
 
-# ──── 4. Install Node.js (Manual Method) ──────
+# ──── 4. Install Node.js ──────
 step "Installing Node.js (v18.20.8) ..."
 
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -54,7 +54,6 @@ sudo apt install -y nodejs
 echo "🧰 Installing global npm packages (yarn, pm2)..."
 npm install -g yarn pm2
 
-echo "✔ Done. Testing..."
 which node
 node -v
 which npm
@@ -63,6 +62,7 @@ which pm2
 pm2 -v
 which yarn
 yarn -v
+echo "✔ Done. Testing..."
 
 # ──── 5. Install Chromium + Unclutter (Kiosk Mode) ─────
 step "Installing Chromium + Unclutter..."
@@ -97,7 +97,7 @@ systemctl --user restart gnome-remote-desktop.service || true
 ok "GNOME Remote Desktop reloaded."
 
 # ──── 10. System Setup and Service Startup ───────
-step "Running final setup and starting services..."
+step "Running setup and starting services..."
 
 # Chromium alias for kiosk compatibility
 echo "🔗 Linking chromium → chromium-browser..."
@@ -216,6 +216,9 @@ echo "-------------------------"
 echo "User cron ($USER_NAME):"
 crontab -u "$USER_NAME" -l
 echo "========================="
+# Give executable permission
+sudo chmod +x /home/sun108/sun108-ota-agent/*.sh
+sudo chmod +x /home/sun108/sun108-ota-agent/utils/redis-cli/*.sh
 
 # ──── 12. Change boot splash image ────────────────
 step "Change boot splash image to SVT logo..."
@@ -224,6 +227,31 @@ sudo ln -sf /usr/share/plymouth/themes/octalanes/octalanes.plymouth /etc/alterna
 sudo ln -sf /etc/alternatives/default.plymouth /usr/share/plymouth/themes/default.plymouth
 sudo mount -o remount,rw /boot
 sudo update-initramfs -u
+
+# ──── 13. Apply device tree overlay ────────────────
+step "Apply device tree overlay"
+sudo cp /user-data/rk3576-octimus-i-board.dtbo /boot/dtb-6.1.115-vendor-rk35xx/rockchip/overlay
+
+ENV_FILE="/boot/armbianEnv.txt"
+OVERLAY_NAME="rk3576-octimus-i-board"
+
+if [ ! -f "$ENV_FILE" ]; then
+    echo "❌ ERROR: $ENV_FILE not found!"
+    exit 1
+fi
+
+echo "📝 Updating $ENV_FILE..."
+
+# 3.1 Change overlay_prefix=rk35xx → rk3576
+sudo sed -i 's/^overlay_prefix=.*/overlay_prefix=rk3576/' "$ENV_FILE"
+
+# 3.2 Add overlays=... only if not exists
+if ! grep -q "^overlays=$OVERLAY_NAME" "$ENV_FILE"; then
+    echo "overlays=$OVERLAY_NAME" | sudo tee -a "$ENV_FILE" > /dev/null
+    echo "✅ Added overlays=$OVERLAY_NAME"
+else
+    echo "ℹ overlays entry already exists, skipping."
+fi
 
 echo "───────────────────────────────────────────────"
 echo -e "✅  ${GREEN}Octimus I setup completed successfully!${RESET}"
