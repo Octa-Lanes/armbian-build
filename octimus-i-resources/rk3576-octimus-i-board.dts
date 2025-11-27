@@ -1,42 +1,162 @@
 /dts-v1/;
 /plugin/;
 
-/ {
+/{
     compatible = "rockchip,rk3576";
 
     fragment@0 {
-        target = <&uart0>;
+        target = <&gpio1>;
         __overlay__ {
-            status = "okay";
-            pinctrl-names = "default";
-            pinctrl-0 = <&uart0m0_xfer>;
+            mcu_boot: mcu_boot {
+                gpio-hog;
+
+                // GPIO1_D3
+                gpios = <27 0>;
+                output-low;
+                line-name = "mcu_boot";
+            };
+
+            mcu_reset: mcu_reset {
+                gpio-hog;
+
+                // GPIO1_D2
+                gpios = <26 0>;
+                output-low;
+                line-name = "mcu_reset";
+            };
+
+            usb_hub_reset: usb_hub_reset {
+                gpio-hog;
+
+                // GPIO1_D4
+                gpios = <28 0>;
+                output-low;
+                line-name = "usb_hub_reset";
+            };
+
+            gsm_module_pwr_key: gsm_module_pwr_key {
+                gpio-hog;
+
+                // GPIO1_C1
+                gpios = <17 0>;
+                output-low;
+                line-name = "gsm_module_pwr_key";
+            };
+
+            gsm_module_reset: gsm_module_reset {
+                gpio-hog;
+
+                // GPIO1_D5
+                gpios = <29 0>;
+                output-low;
+                line-name = "gsm_module_reset";
+            };
+
+            use_wifi_mode: use_wifi_mode {
+                gpio-hog;
+
+                // GPIO1_C2
+                gpios = <18 0>;
+                output-low;
+                line-name = "use_wifi_mode";
+            };
+
         };
     };
 
+    // Main I2C bus for OCTIMUS-I board
     fragment@1 {
-        target = <&uart4>;
-        __overlay__ {
-            status = "okay";
-            pinctrl-names = "default";
-            pinctrl-0 = <&uart4m1_xfer>;
-        };
-    };
+                target = <&i2c8>;
 
+                __overlay__ {
+                        status = "okay";
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&i2c8m1_xfer>;
+                };
+        };
+
+
+    // GSM module main UART, RS-485
     fragment@2 {
-        target = <&uart7>;
-        __overlay__ {
+                target = <&uart7>;
+
+                __overlay__ {
+                        status = "okay";
+                        pinctrl-0 = <&uart7m0_xfer>;
+                };
+        };
+
+    // DB9 RS-232 main communication UART
+    fragment@3 {
+                target = <&uart0>;
+
+                __overlay__ {
+                        status = "okay";
+                        pinctrl-0 = <&uart0m0_xfer>;
+                };
+        };
+
+    // DB9 RS-232 AUX1 communication UART
+    fragment@4 {
+                target = <&uart4>;
+
+                __overlay__ {
+                        status = "okay";
+                        pinctrl-0 = <&uart4m1_xfer>;
+                };
+        };
+
+    // DB9 RS-232 AUX2 communication UART
+    fragment@5 {
+                target = <&uart10>;
+
+                __overlay__ {
+                        status = "okay";
+                        pinctrl-0 = <&uart10m1_xfer>;
+                };
+        };
+
+    // Disable OLD RTC
+    fragment@6 {
+                target = <&hym8563>;
+                __overlay__ {
+                        status = "disabled";
+                };
+        };
+
+    // New RTC at I2C8
+    fragment@7 {
+        target = <&i2c8>;
+	__overlay__ {
             status = "okay";
-            pinctrl-names = "default";
-            pinctrl-0 = <&uart7m0_xfer>;
+
+            rtc@51 {
+                compatible = "nxp,pcf8563";
+                reg = <0x51>;
+                status = "okay";
+ 
+		// NEW interrupt settings
+                interrupt-parent = <&gpio2>;
+                interrupts = <16 8>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&rtc_int>;
+		wakeup-source;
+            };
         };
     };
 
-    fragment@3 {
-        target = <&uart10>;
+    // Override RTC pinctrl
+    fragment@8 {
+        target = <&pinctrl>;
         __overlay__ {
-            status = "okay";
-            pinctrl-names = "default";
-            pinctrl-0 = <&uart10m1_xfer>;
+            rtc {
+                rtc_int: rtc-int {
+                    rockchip,pins = <
+                        2 16 0 &pcfg_pull_up
+                    >;
+                };
+            };
         };
     };
+
 };
