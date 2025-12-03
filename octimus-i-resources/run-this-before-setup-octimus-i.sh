@@ -9,7 +9,7 @@ echo "🧠 Starting pre-extract setup..."
 # 1. Install required packages
 echo "📦 Installing required packages..."
 sudo apt update -y
-sudo apt install -y cloud-guest-utils vim
+sudo apt install -y cloud-guest-utils vim modemmanager
 
 # 2. Detect root partition and parent device correctly
 echo "🔍 Detecting root device..."
