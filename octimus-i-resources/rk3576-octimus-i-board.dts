@@ -34,24 +34,6 @@
                 line-name = "usb_hub_reset";
             };
 
-            gsm_module_pwr_key: gsm_module_pwr_key {
-                gpio-hog;
-
-                // GPIO1_C1
-                gpios = <17 0>;
-                output-low;
-                line-name = "gsm_module_pwr_key";
-            };
-
-            gsm_module_reset: gsm_module_reset {
-                gpio-hog;
-
-                // GPIO1_D5
-                gpios = <29 0>;
-                output-low;
-                line-name = "gsm_module_reset";
-            };
-
             use_wifi_mode: use_wifi_mode {
                 gpio-hog;
 
@@ -86,12 +68,14 @@
                 };
         };
 
+
     // DB9 RS-232 main communication UART
     fragment@3 {
                 target = <&uart0>;
 
                 __overlay__ {
                         status = "okay";
+			pinctrl-names = "default";
                         pinctrl-0 = <&uart0m0_xfer>;
                 };
         };
@@ -117,8 +101,8 @@
         };
 
     // Disable OLD RTC
-    fragment@6 {
-                target = <&hym8563>;
+    fragment@6 {  
+	        target = <&hym8563>;
                 __overlay__ {
                         status = "disabled";
                 };
@@ -135,7 +119,6 @@
                 reg = <0x51>;
                 status = "okay";
  
-		// NEW interrupt settings
                 interrupt-parent = <&gpio2>;
                 interrupts = <16 8>;
                 pinctrl-names = "default";
