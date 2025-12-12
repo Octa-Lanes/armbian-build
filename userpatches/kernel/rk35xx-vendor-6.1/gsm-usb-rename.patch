@@ -1,0 +1,17 @@
+diff --git a/drivers/usb/serial/bus.c b/drivers/usb/serial/bus.c
+index 9e38142acd38..454347dd801a 100644
+--- a/drivers/usb/serial/bus.c
++++ b/drivers/usb/serial/bus.c
+@@ -50,6 +50,12 @@ static int usb_serial_device_probe(struct device *dev)
+ 	}
+ 
+ 	minor = port->minor;
++	if (strcmp(driver->driver.name, "option1") == 0) {
++                usb_serial_tty_driver->name = "ttyGSM";
++        } else {
++                usb_serial_tty_driver->name = "ttyUSB";
++        }
++
+ 	tty_dev = tty_port_register_device(&port->port, usb_serial_tty_driver,
+ 					   minor, dev);
+ 	if (IS_ERR(tty_dev)) {

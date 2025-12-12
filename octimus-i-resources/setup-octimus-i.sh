@@ -46,9 +46,6 @@ step "Installing Node.js (v18.20.8) ..."
 
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
-echo "🧹 Cleaning old node binaries..."
-sudo rm -f /usr/bin/node /usr/bin/npm /usr/bin/npx /usr/bin/corepack /usr/bin/pm2 /usr/bin/pm2-runtime /usr/bin/yarn
-
 sudo apt install -y nodejs
 
 echo "🧰 Installing global npm packages (yarn, pm2)..."
@@ -232,7 +229,7 @@ sudo update-initramfs -u
 step "Apply device tree overlay"
 sudo cp /user-data/rk3576-octimus-i-board.dtbo /boot/dtb-6.1.115-vendor-rk35xx/rockchip/overlay
 
-ENV_FILE="/boot/armbianEnv.txt"
+ENV_FILE="/boot/hopeEnv.txt"
 OVERLAY_NAME="rk3576-octimus-i-board"
 
 if [ ! -f "$ENV_FILE" ]; then
