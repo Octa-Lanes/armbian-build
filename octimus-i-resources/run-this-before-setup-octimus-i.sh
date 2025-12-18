@@ -49,7 +49,7 @@ fi
 # 6. Write /etc/fstab dynamically based on detected device
 echo "🧾 Writing /etc/fstab..."
 sudo bash -c "cat <<EOF > /etc/fstab
-# Do not direct edit this file, this file was generated from run-this-before-extract-user-data.sh
+# Do not direct edit this file
 ${ROOT_DEV}p3 / ext4 defaults,noatime,commit=120,errors=remount-ro 0 1
 ${ROOT_DEV}p1 /boot ext4 defaults,ro 0 2
 ${PART4} /user-data ext4 defaults,noatime,commit=120,errors=remount-ro 0 2
