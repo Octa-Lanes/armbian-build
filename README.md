@@ -69,6 +69,14 @@ After a successful build, the generated OS image will be available at:
 build/output/image/
 ```
 
+### Inject Octimus-I Resources
+
+
+Run this script after a successful build to inject required resources for system setup.
+```bash
+sudo ./post-script-setup.sh
+```
+
 ## Build Host Requirements
 
 - **Supported Architectures:** `x86_64`, `aarch64`, `riscv64`
