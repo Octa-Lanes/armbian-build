@@ -1,6 +1,20 @@
-### Purpose of This Repository
+> **This repository is used exclusively to build the Octimus-I system image by Octalanes.**  
+> It is not intended for general-purpose Armbian image builds.
 
-The **Armbian Linux Build Framework** based on **Debian** or **Ubuntu**. It is designed specifically for Octimus-I by Octalanes
+## Repository Scope
+
+**This repository:**
+- Builds the official **Octimus-I production OS image**
+- Includes Octimus-I specific kernel patches, device trees, and resources
+
+**This repository does NOT:**
+- Document end-user device setup (available in internal Confluence documentation)
+- Provide application-level deployment guides (available in internal Confluence documentation)
+
+## Purpose — Octimus-I Image Build System
+
+The **Armbian Linux Build Framework** based on **Debian** or **Ubuntu**,
+customized specifically for **Octimus-I** by **Octalanes**.
 
 The toolchain builds a fully customized system image, including:
 
@@ -10,9 +24,7 @@ The toolchain builds a fully customized system image, including:
 - Filesystem layout and compression
 - Additional drivers, overlays, and device trees
 
-It ensures **consistency across devices** while remaining modular and extensible through a variety of configuration files and user patches.
-
-### Getting started
+## Getting started
 
 Clone the repository:
 ```bash
@@ -24,7 +36,7 @@ Enter the build directory:
 cd build
 ```
 
-## User-Data Partition (Required)
+### User-Data Partition (Required)
 
 Before building an Octimus-I image, a prebuilt SVT application archive named: user-data.tar.gz is required.
 
@@ -38,7 +50,7 @@ Download the archive from:
 https://8lanes.sgp1.digitaloceanspaces.com/hope-resource/user-data.tar.gz
 ```
 
-## Build Options
+### Build Options
 
 Build Using Armbian Interactive UI
 ```bash
@@ -57,7 +69,7 @@ After a successful build, the generated OS image will be available at:
 build/output/image/
 ```
 
-### Build Host Requirements
+## Build Host Requirements
 
 - **Supported Architectures:** `x86_64`, `aarch64`, `riscv64`
 - **System:** VM, container, or bare-metal with:
