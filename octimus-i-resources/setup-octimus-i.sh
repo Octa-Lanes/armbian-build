@@ -108,9 +108,8 @@ sudo rm -rf ~/.cache/chromium
 # Start PM2 service for sun108-api
 if command -v pm2 >/dev/null 2>&1; then
   echo "🚀 Starting PM2 process for sun108-api..."
-  pm2 start /home/sun108/sun108-api/server.js --name sun108-api || true
+  pm2 start /home/sun108/sun108-api/server.js --name sun108-api --cwd /home/sun108/sun108-api || true
   pm2 save || true
-  pm2 startup || true
   ok "PM2 service initialized."
 else
   warn "pm2 not found — skipping sun108-api startup."
