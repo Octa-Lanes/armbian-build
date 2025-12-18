@@ -69,4 +69,3 @@ build/output/image/
 - **Windows:** Windows 10/11 with WSL2 running Armbian / Ubuntu 24.04
 - **Access:** Superuser rights (`sudo` or `root`)
 - **Important:** Keep your system up-to-date — outdated tools (e.g., Docker) can cause issues.
-
