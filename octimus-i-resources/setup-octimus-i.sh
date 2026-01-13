@@ -61,9 +61,9 @@ which yarn
 yarn -v
 echo "✔ Done. Testing..."
 
-# ──── 5. Install Chromium + Unclutter (Kiosk Mode) ─────
-step "Installing Chromium + Unclutter..."
-apt install -y chromium unclutter
+# ──── 5. Install Unclutter (Kiosk Mode) ─────
+step "Installing Unclutter..."
+apt install -y unclutter
 ok "Chromium and Unclutter installed."
 
 # ──── 6. Install NGINX with all modules ────────────────
@@ -110,6 +110,7 @@ if command -v pm2 >/dev/null 2>&1; then
   echo "🚀 Starting PM2 process for sun108-api..."
   pm2 start /home/sun108/sun108-api/server.js --name sun108-api --cwd /home/sun108/sun108-api || true
   pm2 save || true
+  pm2 startup || true
   ok "PM2 service initialized."
 else
   warn "pm2 not found — skipping sun108-api startup."
